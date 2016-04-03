@@ -25,7 +25,7 @@ public class AlphanumericEncoder {
     }
     private static void addRangeToListBuilder(ImmutableList.Builder<Character> digitListBuilder, char from, char to) {
         IntStream.rangeClosed(from, to)
-                .mapToObj(c -> Character.valueOf((char) c))
+                .mapToObj(c -> (char) c)
                 .forEach(digitListBuilder::add);
     }
 

@@ -16,18 +16,41 @@ public class MappingModel {
     @Autowired
     private AlphanumericEncoder alphanumericEncoder;
 
-    public URL shortenUrl(URL url) {
-        Preconditions.checkNotNull(url);
+    public URL shortenUrl(URL longUrl) {
+        Preconditions.checkNotNull(longUrl);
 
-        // encode url into an alphanumeric-base string
-        String code = alphanumericEncoder.encodeAlphanumeric(url.toString());
-        String hostName = getLocalHostName();
-        try {
-            return new URL(url.getProtocol(), hostName, "/" + code);
-        } catch (MalformedURLException e) {
-            LOG.error("Exception trying to form URL from protocol {}, local host name {}, and code {}: {}", url.getProtocol(), hostName, code, e);
-            throw new RuntimeException("Can't form short URL from original url, local host name, and code", e);
+        // first, check store for existence of entry for long url
+        URL shortUrl = shortLongUrlMap.inverse().get(longUrl);
+        if (shortUrl != null) {
+            LOG.info("Long url {} has already been shortened to {}. Store still has {} entries.", longUrl, shortUrl, shortLongUrlMap.size());
+            return shortUrl;
         }
+
+        // create short url, trying multiple times in case of collisions
+        int tries = 10;
+        while (tries-- > 0) {
+            // encode long url as an alphanumeric-base string
+            String code = alphanumericEncoder.encodeAlphanumeric(longUrl.toString());
+            String hostName = getLocalHostName();
+            try {
+                shortUrl = new URL(longUrl.getProtocol(), hostName, "/" + code);
+            } catch (MalformedURLException e) {
+                LOG.error("Exception trying to form URL from protocol {}, local host name {}, and code {}: {}", longUrl.getProtocol(), hostName, code, e);
+                throw new RuntimeException("Can't form short URL from original url, local host name, and code", e);
+            }
+
+            // check for entry in data store; store and return it if it doesn't exist (i.e. no collision)
+            if (!shortLongUrlMap.containsKey(shortUrl)) {
+                shortLongUrlMap.put(shortUrl, longUrl);
+                LOG.info("Shortened {} to {}. Store has now {} entries.", longUrl, shortUrl, shortLongUrlMap.size());
+                return shortUrl;
+            }
+            Preconditions.checkState(!shortLongUrlMap.get(shortUrl).equals(longUrl)); // it must be a collision
+        }
+
+        String errorMessage = "Exhausted tries to generate a non-colliding short url";
+        LOG.error(errorMessage);
+        throw new RuntimeException(errorMessage);
     }
 
     private String getLocalHostName() {
