@@ -12,20 +12,20 @@ import java.util.stream.*;
 @Component
 public class AlphanumericEncoder {
     @VisibleForTesting
-    static final List<String> ALPHANUMERIC_DIGITS = getAlphanumericDigitsAsStrings();
+    static final List<Character> ALPHANUMERIC_DIGITS = getAlphanumericDigitsAsStrings();
     @VisibleForTesting
     static final int BASE_ALPHANUMERIC = ALPHANUMERIC_DIGITS.size();
 
-    private static List<String> getAlphanumericDigitsAsStrings() {
-        ImmutableList.Builder<String> digitListBuilder = ImmutableList.builder();
+    private static List<Character> getAlphanumericDigitsAsStrings() {
+        ImmutableList.Builder<Character> digitListBuilder = ImmutableList.builder();
         addRangeToListBuilder(digitListBuilder, '0', '9');
         addRangeToListBuilder(digitListBuilder, 'a', 'z');
         addRangeToListBuilder(digitListBuilder, 'A', 'Z');
         return digitListBuilder.build();
     }
-    private static void addRangeToListBuilder(ImmutableList.Builder<String> digitListBuilder, char from, char to) {
+    private static void addRangeToListBuilder(ImmutableList.Builder<Character> digitListBuilder, char from, char to) {
         IntStream.rangeClosed(from, to)
-                .mapToObj(c -> Character.toString((char) c))
+                .mapToObj(c -> Character.valueOf((char) c))
                 .forEach(digitListBuilder::add);
     }
 
@@ -47,7 +47,7 @@ public class AlphanumericEncoder {
         Preconditions.checkArgument(unsignedValue >= 0);
 
         if (unsignedValue == 0) {
-            return ALPHANUMERIC_DIGITS.get(0);
+            return ALPHANUMERIC_DIGITS.get(0).toString();
         }
 
         StringBuilder codeBuilder = new StringBuilder();
