@@ -3,9 +3,9 @@ package org.santel.url.model;
 import com.google.common.annotations.*;
 import com.google.common.base.*;
 import com.google.common.collect.*;
-import org.springframework.beans.factory.annotation.*;
 import org.springframework.stereotype.*;
 
+import javax.inject.*;
 import java.util.*;
 import java.util.stream.*;
 
@@ -29,7 +29,7 @@ public class AlphanumericEncoder {
                 .forEach(digitListBuilder::add);
     }
 
-    @Autowired
+    @Inject
     private Random random;
 
     /**

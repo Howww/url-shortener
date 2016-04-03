@@ -1,13 +1,12 @@
 package org.santel.url.model;
 
 import org.santel.url.*;
-import org.santel.url.model.*;
-import org.springframework.beans.factory.annotation.*;
 import org.springframework.test.context.*;
 import org.springframework.test.context.testng.*;
 import org.testng.*;
 import org.testng.annotations.*;
 
+import javax.inject.*;
 import java.net.*;
 import java.util.regex.*;
 
@@ -25,7 +24,7 @@ public class MappingModelSpringTest extends AbstractTestNGSpringContextTests {
         }
     }
 
-    @Autowired
+    @Inject
     private MappingModel mappingModel;
 
     @Test

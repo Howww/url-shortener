@@ -3,9 +3,9 @@ package org.santel.url.model;
 import com.google.common.base.*;
 import org.santel.url.dao.*;
 import org.slf4j.*;
-import org.springframework.beans.factory.annotation.*;
 import org.springframework.stereotype.*;
 
+import javax.inject.*;
 import java.net.*;
 
 @Component
@@ -13,9 +13,9 @@ public class MappingModel {
     private static final Logger LOG = LoggerFactory.getLogger(MappingModel.class);
     private static final String SHORT_URL_PROTOCOL = "http"; //TODO make more secure with https
 
-    @Autowired
+    @Inject
     private MappingDao mappingDao;
-    @Autowired
+    @Inject
     private AlphanumericEncoder alphanumericEncoder;
 
     public URL shortenUrl(URL longUrl) {
