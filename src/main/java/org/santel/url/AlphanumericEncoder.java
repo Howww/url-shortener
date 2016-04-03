@@ -1,5 +1,7 @@
 package org.santel.url;
 
+import com.google.common.annotations.*;
+import com.google.common.base.*;
 import com.google.common.collect.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.stereotype.*;
@@ -9,8 +11,10 @@ import java.util.stream.*;
 
 @Component
 public class AlphanumericEncoder {
-    private static final List<String> ALPHANUMERIC_DIGITS = getAlphanumericDigitsAsStrings();
-    private static final int BASE_ALPHANUMERIC = ALPHANUMERIC_DIGITS.size();
+    @VisibleForTesting
+    static final List<String> ALPHANUMERIC_DIGITS = getAlphanumericDigitsAsStrings();
+    @VisibleForTesting
+    static final int BASE_ALPHANUMERIC = ALPHANUMERIC_DIGITS.size();
 
     private static List<String> getAlphanumericDigitsAsStrings() {
         ImmutableList.Builder<String> digitListBuilder = ImmutableList.builder();
@@ -35,11 +39,22 @@ public class AlphanumericEncoder {
      */
     public String encodeAlphanumeric(String original) {
         int randomValue = Math.abs(random.nextInt());
+        return encodeAlphanumeric(randomValue);
+    }
+
+    @VisibleForTesting
+    String encodeAlphanumeric(int unsignedValue) {
+        Preconditions.checkArgument(unsignedValue >= 0);
+
+        if (unsignedValue == 0) {
+            return ALPHANUMERIC_DIGITS.get(0);
+        }
+
         StringBuilder codeBuilder = new StringBuilder();
-        while (randomValue > 0) {
-            int alphanumericPoint = randomValue % BASE_ALPHANUMERIC;
+        while (unsignedValue > 0) {
+            int alphanumericPoint = unsignedValue % BASE_ALPHANUMERIC;
             codeBuilder.append(ALPHANUMERIC_DIGITS.get(alphanumericPoint));
-            randomValue /= BASE_ALPHANUMERIC;
+            unsignedValue /= BASE_ALPHANUMERIC;
         }
 
         return codeBuilder.toString();
