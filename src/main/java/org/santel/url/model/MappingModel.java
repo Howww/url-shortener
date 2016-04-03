@@ -1,6 +1,7 @@
-package org.santel.url;
+package org.santel.url.model;
 
 import com.google.common.base.*;
+import org.santel.url.dao.*;
 import org.slf4j.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.stereotype.*;

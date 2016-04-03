@@ -1,4 +1,4 @@
-package org.santel.url;
+package org.santel.url.dao;
 
 import com.google.common.collect.*;
 import org.slf4j.*;

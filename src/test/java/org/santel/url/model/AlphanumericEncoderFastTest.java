@@ -1,4 +1,4 @@
-package org.santel.url;
+package org.santel.url.model;
 
 import org.testng.*;
 import org.testng.annotations.*;

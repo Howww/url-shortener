@@ -1,4 +1,4 @@
-package org.santel.url;
+package org.santel.url.model;
 
 import com.google.common.annotations.*;
 import com.google.common.base.*;

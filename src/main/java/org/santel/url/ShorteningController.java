@@ -1,12 +1,12 @@
 package org.santel.url;
 
+import org.santel.url.model.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.*;
 import java.io.*;
 import java.net.*;
-import java.util.concurrent.atomic.*;
 
 @RestController
 public class ShorteningController {

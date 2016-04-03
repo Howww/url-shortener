@@ -1,5 +1,7 @@
-package org.santel.url;
+package org.santel.url.model;
 
+import org.santel.url.*;
+import org.santel.url.model.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.test.context.*;
 import org.springframework.test.context.testng.*;
@@ -8,7 +10,6 @@ import org.testng.annotations.*;
 
 import java.net.*;
 import java.util.regex.*;
-import java.util.stream.*;
 
 @ContextConfiguration(classes = ShorteningService.class)
 public class MappingModelSpringTest extends AbstractTestNGSpringContextTests {
