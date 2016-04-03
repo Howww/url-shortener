@@ -1,7 +1,6 @@
 package org.santel.url;
 
 import com.google.common.base.*;
-import com.google.common.collect.*;
 import org.slf4j.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.stereotype.*;
@@ -13,7 +12,8 @@ public class MappingModel {
     private static final Logger LOG = LoggerFactory.getLogger(MappingModel.class);
     private static final String SHORT_URL_PROTOCOL = "http"; //TODO make more secure with https
 
-    private final BiMap<URL, URL> shortLongUrlMap = HashBiMap.create(4096); // arbitrary initial size for demo purposes
+    @Autowired
+    private MappingDao mappingDao;
     @Autowired
     private AlphanumericEncoder alphanumericEncoder;
 
@@ -21,9 +21,9 @@ public class MappingModel {
         Preconditions.checkNotNull(longUrl);
 
         // first, check store for existence of entry for long url
-        URL shortUrl = shortLongUrlMap.inverse().get(longUrl);
+        URL shortUrl = mappingDao.getShortUrl(longUrl);
         if (shortUrl != null) {
-            LOG.info("Long url {} has already been shortened to {}. Store still has {} entries.", longUrl, shortUrl, shortLongUrlMap.size());
+            LOG.info("Long url {} has already been shortened to {}", longUrl, shortUrl);
             return shortUrl;
         }
 
@@ -35,12 +35,13 @@ public class MappingModel {
             shortUrl = getShortUrlFromCode(shortCode);
 
             // check for entry in data store; store and return it if it doesn't exist (i.e. no collision)
-            if (!shortLongUrlMap.containsKey(shortUrl)) {
-                shortLongUrlMap.put(shortUrl, longUrl);
-                LOG.info("Shortened {} to {}. Store has now {} entries.", longUrl, shortUrl, shortLongUrlMap.size());
+            if (mappingDao.addUrlEntry(shortUrl, longUrl)) {
+                LOG.info("Shortened {} to {}", longUrl, shortUrl);
                 return shortUrl;
             }
-            Preconditions.checkState(!shortLongUrlMap.get(shortUrl).equals(longUrl)); // it must be a collision
+
+            URL storedLongUrl = mappingDao.getLongUrl(shortUrl);
+            Preconditions.checkState(storedLongUrl != null && !storedLongUrl.equals(longUrl)); // it must be a collision
         }
 
         String errorMessage = "Exhausted tries to generate a non-colliding short url";
@@ -71,13 +72,13 @@ public class MappingModel {
 
     public URL expandUrl(String shortCode) {
         URL shortUrl = getShortUrlFromCode(shortCode);
-        URL longUrl = shortLongUrlMap.get(shortUrl);
+        URL longUrl = mappingDao.getLongUrl(shortUrl);
         if (longUrl == null) {
             String errorMessage = String.format("Short url %s not found in store", shortUrl);
             LOG.error(errorMessage);
             throw new RuntimeException(errorMessage);
         }
-        LOG.info("Expanded {} to {}. Store contains {} entries.", shortUrl, longUrl, shortLongUrlMap.size());
+        LOG.info("Expanded {} to {}", shortUrl, longUrl);
         return longUrl;
     }
 }
