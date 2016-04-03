@@ -19,12 +19,12 @@ public class ShorteningController {
     public String shortenUrl(@RequestParam(value="url") String longUrlAsString) throws MalformedURLException {
         URL longUrl = new URL(longUrlAsString);
         URL shortUrl = mappingModel.shortenUrl(longUrl);
-//        return "Stub; when implemented it will shorten " + longUrl;
         return shortUrl.toString();
     }
 
     @RequestMapping(value = "/{code:[a-zA-Z0-9]+}")
     public void expandAndRedirect(@PathVariable String code, HttpServletResponse httpServletResponse) throws IOException {
-        httpServletResponse.sendRedirect("http://expanded.url.stub"); //TODO: use expanded url from short url, if found
+        URL longUrl = mappingModel.expandUrl(code);
+        httpServletResponse.sendRedirect(longUrl.toString());
     }
 }

@@ -11,8 +11,9 @@ import java.net.*;
 @Component
 public class MappingModel {
     private static final Logger LOG = LoggerFactory.getLogger(MappingModel.class);
+    private static final String SHORT_URL_PROTOCOL = "http"; //TODO make more secure with https
 
-    private final BiMap<URL, URL> shortLongUrlMap = HashBiMap.create(4096); // arbitrary initial expected size for demo purposes
+    private final BiMap<URL, URL> shortLongUrlMap = HashBiMap.create(4096); // arbitrary initial size for demo purposes
     @Autowired
     private AlphanumericEncoder alphanumericEncoder;
 
@@ -30,14 +31,8 @@ public class MappingModel {
         int tries = 10;
         while (tries-- > 0) {
             // encode long url as an alphanumeric-base string
-            String code = alphanumericEncoder.encodeAlphanumeric(longUrl.toString());
-            String hostName = getLocalHostName();
-            try {
-                shortUrl = new URL(longUrl.getProtocol(), hostName, "/" + code);
-            } catch (MalformedURLException e) {
-                LOG.error("Exception trying to form URL from protocol {}, local host name {}, and code {}: {}", longUrl.getProtocol(), hostName, code, e);
-                throw new RuntimeException("Can't form short URL from original url, local host name, and code", e);
-            }
+            String shortCode = alphanumericEncoder.encodeAlphanumeric(longUrl.toString());
+            shortUrl = getShortUrlFromCode(shortCode);
 
             // check for entry in data store; store and return it if it doesn't exist (i.e. no collision)
             if (!shortLongUrlMap.containsKey(shortUrl)) {
@@ -53,6 +48,18 @@ public class MappingModel {
         throw new RuntimeException(errorMessage);
     }
 
+    private URL getShortUrlFromCode(String shortCode) {
+        URL shortUrl;
+        String hostName = getLocalHostName();
+        try {
+            shortUrl = new URL(SHORT_URL_PROTOCOL, hostName, "/" + shortCode);
+        } catch (MalformedURLException e) {
+            LOG.error("Exception trying to form URL from protocol {}, local host name {}, and code {}: {}", SHORT_URL_PROTOCOL, hostName, shortCode, e);
+            throw new RuntimeException("Can't form short URL from original url, local host name, and code", e);
+        }
+        return shortUrl;
+    }
+
     private String getLocalHostName() {
         try {
             return InetAddress.getLocalHost().getHostName();
@@ -60,5 +67,17 @@ public class MappingModel {
             LOG.error("Exception identifying local host name", e);
             throw new RuntimeException("Can't identify local host name", e);
         }
+    }
+
+    public URL expandUrl(String shortCode) {
+        URL shortUrl = getShortUrlFromCode(shortCode);
+        URL longUrl = shortLongUrlMap.get(shortUrl);
+        if (longUrl == null) {
+            String errorMessage = String.format("Short url %s not found in store", shortUrl);
+            LOG.error(errorMessage);
+            throw new RuntimeException(errorMessage);
+        }
+        LOG.info("Expanded {} to {}. Store contains {} entries.", shortUrl, longUrl, shortLongUrlMap.size());
+        return longUrl;
     }
 }
