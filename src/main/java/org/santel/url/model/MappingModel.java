@@ -1,6 +1,8 @@
 package org.santel.url.model;
 
 import com.google.common.base.*;
+import org.santel.exception.*;
+import org.santel.net.*;
 import org.santel.url.dao.*;
 import org.slf4j.*;
 import org.springframework.stereotype.*;
@@ -52,7 +54,7 @@ public class MappingModel {
 
     private URL getShortUrlFromCode(String shortCode) {
         URL shortUrl;
-        String hostName = getLocalHostName();
+        String hostName = Network.getLocalHostName();
         try {
             shortUrl = new URL(SHORT_URL_PROTOCOL, hostName, "/" + shortCode);
         } catch (MalformedURLException e) {
@@ -62,22 +64,11 @@ public class MappingModel {
         return shortUrl;
     }
 
-    private String getLocalHostName() {
-        try {
-            return InetAddress.getLocalHost().getHostName();
-        } catch (UnknownHostException e) {
-            LOG.error("Exception identifying local host name", e);
-            throw new RuntimeException("Can't identify local host name", e);
-        }
-    }
-
     public URL expandUrl(String shortCode) {
         URL shortUrl = getShortUrlFromCode(shortCode);
         URL longUrl = mappingDao.getLongUrl(shortUrl);
         if (longUrl == null) {
-            String errorMessage = String.format("Short url %s not found in store", shortUrl);
-            LOG.error(errorMessage);
-            throw new RuntimeException(errorMessage);
+            Exceptions.logAndThrow(LOG, String.format("Short url %s not found in store", shortUrl));
         }
         LOG.info("Expanded {} to {}", shortUrl, longUrl);
         return longUrl;
