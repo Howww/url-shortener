@@ -1,6 +1,9 @@
 package org.santel.url.model;
 
 import org.santel.url.*;
+import org.santel.url.dao.*;
+import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.*;
 import org.springframework.test.context.testng.*;
 import org.testng.*;
@@ -21,6 +24,15 @@ public class MappingModelSpringTest extends AbstractTestNGSpringContextTests {
             SHORT_URL_PATTERN = Pattern.compile(SHORT_URL_PREFIX + InetAddress.getLocalHost().getHostName() + "/[0-9a-z-A-Z]{1," + AlphanumericEncoder.BASE_ALPHANUMERIC + "}");
         } catch (Exception e) {
             throw new RuntimeException("Failed to initialize static fields", e);
+        }
+    }
+
+    @Configuration
+    static class TestShorteningConfiguration {
+        @Bean
+        public MappingDao getMappingDaoBean() {
+            String dynamoDbUrl = System.getProperty("dynamodb.url", "http://localhost:8000"); //TODO add to Spring property system?
+            return new DynamoDbMappingDao(dynamoDbUrl);
         }
     }
 
