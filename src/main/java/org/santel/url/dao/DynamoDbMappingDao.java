@@ -18,22 +18,26 @@ public class DynamoDbMappingDao implements MappingDao {
 
     /** @return Stored short url for long url, or null if entry does not exist */
     public URL getShortUrl(URL longUrl) {
-//        return getUrl("longUrl", longUrl, "shortUrl");
-        throw new IllegalStateException("not implemented yet");
+        String shortUrlAsString = dynamoDbBroker.queryKey(longUrl.toString());
+        return getUrl(shortUrlAsString);
     }
 
     /** @return Stored long url for short url, or null if entry does not exist */
     public URL getLongUrl(URL shortUrl) {
         String longUrlAsString = dynamoDbBroker.queryValue(shortUrl.toString());
-        URL longUrl = null;
-        if (longUrlAsString != null) {
+        return getUrl(longUrlAsString);
+    }
+
+    private URL getUrl(String urlAsString) {
+        URL url = null;
+        if (urlAsString != null) {
             try {
-                longUrl = new URL(longUrlAsString);
+                url = new URL(urlAsString);
             } catch (MalformedURLException e) {
-                Exceptions.logAndThrow(LOG, String.format("Unable to form short url from stored long url %s", longUrlAsString));
+                Exceptions.logAndThrow(LOG, String.format("Unable to form url from %s", urlAsString));
             }
         }
-        return longUrl;
+        return url;
     }
 
     /** @return True if a short url did not exist and therefore the new entry was added; false otherwise */

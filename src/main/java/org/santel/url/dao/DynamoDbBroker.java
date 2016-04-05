@@ -5,6 +5,7 @@ import com.amazonaws.services.dynamodbv2.document.*;
 import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.document.internal.*;
 import com.amazonaws.services.dynamodbv2.document.spec.*;
+import com.amazonaws.services.dynamodbv2.document.utils.*;
 import com.amazonaws.services.dynamodbv2.model.*;
 import com.google.common.annotations.*;
 import com.google.common.base.*;
@@ -46,25 +47,21 @@ public class DynamoDbBroker {
     private CreateTableRequest getCreateTableRequest(ProvisionedThroughput provisionedThroughput) {
         GlobalSecondaryIndex globalSecondaryIndex = getGlobalSecondaryIndex(provisionedThroughput);
 
-        CreateTableRequest createTableRequest = new CreateTableRequest(
+        return new CreateTableRequest(
                 ImmutableList.of(new AttributeDefinition(KEY_ATTRIBUTE_NAME, ScalarAttributeType.S), new AttributeDefinition(VALUE_ATTRIBUTE_NAME, ScalarAttributeType.S)),
                 tableName,
                 ImmutableList.of(new KeySchemaElement(KEY_ATTRIBUTE_NAME, KeyType.HASH)),
-                provisionedThroughput);
-
-        createTableRequest.setGlobalSecondaryIndexes(ImmutableList.of(globalSecondaryIndex));
-        return createTableRequest;
+                provisionedThroughput)
+                .withGlobalSecondaryIndexes(ImmutableList.of(globalSecondaryIndex));
     }
 
     private GlobalSecondaryIndex getGlobalSecondaryIndex(ProvisionedThroughput provisionedThroughput) {
-        GlobalSecondaryIndex globalSecondaryIndex = new GlobalSecondaryIndex();
-        globalSecondaryIndex.setIndexName(VALUE_ATTRIBUTE_NAME);
-        globalSecondaryIndex.setKeySchema(ImmutableList.of(new KeySchemaElement(VALUE_ATTRIBUTE_NAME, KeyType.HASH)));
-        globalSecondaryIndex.setProvisionedThroughput(provisionedThroughput);
-        Projection projection = new Projection();
-        projection.setProjectionType(ProjectionType.ALL);
-        globalSecondaryIndex.setProjection(projection);
-        return globalSecondaryIndex;
+        return new GlobalSecondaryIndex()
+                .withIndexName(VALUE_ATTRIBUTE_NAME)
+                .withKeySchema(ImmutableList.of(new KeySchemaElement(VALUE_ATTRIBUTE_NAME, KeyType.HASH)))
+                .withProvisionedThroughput(provisionedThroughput)
+                .withProjection(new Projection()
+                        .withProjectionType(ProjectionType.ALL));
     }
 
     @VisibleForTesting
@@ -117,6 +114,30 @@ public class DynamoDbBroker {
                 return String.class.cast(entry.getValue());
             }
             Preconditions.checkState(entry.getKey().equals(KEY_ATTRIBUTE_NAME));
+        }
+        throw new IllegalStateException("Shouldn't get here");
+    }
+
+    public String queryKey(String value) {
+        Table table = dynamoDB.getTable(tableName);
+        Index index = table.getIndex(VALUE_ATTRIBUTE_NAME);
+        QuerySpec querySpec = new QuerySpec()
+                .withKeyConditionExpression("#v = :value")
+                .withNameMap(new NameMap().with("#v", VALUE_ATTRIBUTE_NAME))
+                .withValueMap(new ValueMap().withString(":value", value));
+        ItemCollection<QueryOutcome> items = index.query(querySpec);
+        IteratorSupport<Item, QueryOutcome> itemIterator = items.iterator();
+        if (!itemIterator.hasNext()) {
+            return null;
+        }
+        Item item = itemIterator.next();
+        Preconditions.checkState(!itemIterator.hasNext());
+
+        for (Map.Entry<String, Object> entry : item.attributes()) {
+            if (entry.getKey().equals(KEY_ATTRIBUTE_NAME)) {
+                return String.class.cast(entry.getValue());
+            }
+            Preconditions.checkState(entry.getKey().equals(VALUE_ATTRIBUTE_NAME));
         }
         throw new IllegalStateException("Shouldn't get here");
     }

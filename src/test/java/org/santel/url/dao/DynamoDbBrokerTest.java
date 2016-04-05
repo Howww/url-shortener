@@ -30,10 +30,17 @@ public class DynamoDbBrokerTest {
     }
 
     @Test
-    void canStoreAndReadUrlEntry() {
+    void canStoreAndReadUrlEntryByKey() {
         AssertJUnit.assertTrue("Table creation should succeed", dynamoDbBroker.createTable());
         AssertJUnit.assertTrue("First insertion should succeed", dynamoDbBroker.insertEntry(TEST_KEY, TEST_VALUE)); // first insertion succeeds
-        AssertJUnit.assertEquals("Value for key should be one we inserted", TEST_VALUE, dynamoDbBroker.queryValue(TEST_KEY));
+        AssertJUnit.assertEquals("Value for key should be what we inserted", TEST_VALUE, dynamoDbBroker.queryValue(TEST_KEY));
+    }
+
+    @Test
+    void canStoreAndReadUrlEntryByValue() {
+        AssertJUnit.assertTrue("Table creation should succeed", dynamoDbBroker.createTable());
+        AssertJUnit.assertTrue("First insertion should succeed", dynamoDbBroker.insertEntry(TEST_KEY, TEST_VALUE)); // first insertion succeeds
+        AssertJUnit.assertEquals("Key for value should be what we inserted", TEST_KEY, dynamoDbBroker.queryKey(TEST_VALUE));
     }
 
     @Test
