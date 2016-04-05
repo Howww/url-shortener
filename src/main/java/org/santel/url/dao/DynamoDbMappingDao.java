@@ -18,29 +18,26 @@ public class DynamoDbMappingDao implements MappingDao {
 
     /** @return Stored short url for long url, or null if entry does not exist */
     public URL getShortUrl(URL longUrl) {
-        return getUrl("longUrl", longUrl, "shortUrl");
+//        return getUrl("longUrl", longUrl, "shortUrl");
+        throw new IllegalStateException("not implemented yet");
     }
 
     /** @return Stored long url for short url, or null if entry does not exist */
     public URL getLongUrl(URL shortUrl) {
-        return getUrl("shortUrl", shortUrl, "longUrl");
-    }
-
-    private URL getUrl(String keyAttributeName, URL keyUrl, String valueAttributeName) {
-        String storedUrlAsString = dynamoDbBroker.query(keyAttributeName, keyUrl.toString(), valueAttributeName);
-        URL storedUrl = null;
-        if (storedUrlAsString != null) {
+        String longUrlAsString = dynamoDbBroker.queryValue(shortUrl.toString());
+        URL longUrl = null;
+        if (longUrlAsString != null) {
             try {
-                storedUrl = new URL(storedUrlAsString);
+                longUrl = new URL(longUrlAsString);
             } catch (MalformedURLException e) {
-                Exceptions.logAndThrow(LOG, String.format("Unable to form %s from stored %s value %s", keyAttributeName, valueAttributeName, storedUrlAsString));
+                Exceptions.logAndThrow(LOG, String.format("Unable to form short url from stored long url %s", longUrlAsString));
             }
         }
-        return storedUrl;
+        return longUrl;
     }
 
     /** @return True if a short url did not exist and therefore the new entry was added; false otherwise */
     public boolean addUrlEntry(URL shortUrl, URL longUrl) {
-        throw new IllegalStateException("not implemented yet");
+        return dynamoDbBroker.insertEntry(shortUrl.toString(), longUrl.toString());
     }
 }
