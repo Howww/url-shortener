@@ -1,5 +1,6 @@
 package org.santel.url.dao;
 
+import com.amazonaws.regions.*;
 import com.amazonaws.services.dynamodbv2.*;
 import com.amazonaws.services.dynamodbv2.document.*;
 import com.amazonaws.services.dynamodbv2.document.Table;
@@ -22,9 +23,15 @@ public class DynamoDbBroker {
     private final String tableName;
 
     public DynamoDbBroker(String dynamoDbUrl, String tableName) {
-        AmazonDynamoDBClient client = new AmazonDynamoDBClient().withEndpoint(dynamoDbUrl);
+        AmazonDynamoDBClient client = selectDynamoDbClient(dynamoDbUrl);
         this.dynamoDB = new DynamoDB(client);
         this.tableName = tableName;
+    }
+
+    private AmazonDynamoDBClient selectDynamoDbClient(String dynamoDbUrl) {
+        return System.getProperty("santel.url.local") == null?
+                new AmazonDynamoDBClient().withRegion(Regions.US_WEST_2) :
+                new AmazonDynamoDBClient().withEndpoint(dynamoDbUrl);
     }
 
     public boolean createTable() {

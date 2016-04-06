@@ -30,9 +30,9 @@ public class ShorteningService {
     static class ProductionShorteningConfiguration {
         @Bean
         public MappingDao getMappingDaoBean() {
-            String useInMemoryStore = System.getProperty("inmemorystore"); //TODO add to Spring property system?
+            String useInMemoryStore = System.getProperty("santel.url.inmemory"); //TODO add to Spring property system?
             return useInMemoryStore == null?
-                    new DynamoDbMappingDao(System.getProperty("dynamodb.url", "http://localhost:8000")) : //TODO add to Spring property system?
+                    new DynamoDbMappingDao(System.getProperty("santel.dynamodb.url", "http://localhost:8000")) : //TODO add to Spring property system?
                     new InMemoryMappingDao();
         }
     }
