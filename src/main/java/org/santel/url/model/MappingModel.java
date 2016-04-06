@@ -43,6 +43,13 @@ public class MappingModel {
                 return shortUrl;
             }
 
+            // long URL might have been added by another thread or instance in the meantime
+            URL anotherShortUrl = mappingDao.getShortUrl(longUrl);
+            if (anotherShortUrl != null) {
+                LOG.info("Long url {} was shortened in the meantime to {}", longUrl, anotherShortUrl);
+                return anotherShortUrl;
+            }
+
             URL storedLongUrl = mappingDao.getLongUrl(shortUrl);
             Preconditions.checkState(storedLongUrl != null && !storedLongUrl.equals(longUrl)); // it must be a collision
         }

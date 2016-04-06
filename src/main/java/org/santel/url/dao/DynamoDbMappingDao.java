@@ -1,5 +1,6 @@
 package org.santel.url.dao;
 
+import com.google.common.annotations.*;
 import org.santel.exception.*;
 import org.slf4j.*;
 
@@ -12,7 +13,12 @@ public class DynamoDbMappingDao implements MappingDao {
     private final DynamoDbBroker dynamoDbBroker;
 
     public DynamoDbMappingDao(String dynamoDbUrl) {
-        this.dynamoDbBroker = new DynamoDbBroker(dynamoDbUrl, URL_MAP_TABLE_NAME);
+        this(new DynamoDbBroker(dynamoDbUrl, URL_MAP_TABLE_NAME));
+    }
+
+    @VisibleForTesting
+    public DynamoDbMappingDao(DynamoDbBroker dynamoDbBroker) {
+        this.dynamoDbBroker = dynamoDbBroker;
         this.dynamoDbBroker.createTable(); // ensure that the table exists
     }
 

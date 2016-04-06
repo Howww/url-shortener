@@ -14,7 +14,7 @@ public class DynamoDbBrokerTest {
     @BeforeMethod
     void beforeDynamoDbBrokerMethod() {
         String dynamoDbUrl = System.getProperty("dynamodb.url", "http://localhost:8000"); //TODO add to Spring property system?
-        dynamoDbBroker = new DynamoDbBroker(dynamoDbUrl, "TestTable");
+        dynamoDbBroker = new DynamoDbBroker(dynamoDbUrl, "TestTableDynamoDbBrokerTest");
         dynamoDbBroker.deleteTable(); // make sure test table starts clean
     }
 

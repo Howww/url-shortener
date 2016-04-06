@@ -7,7 +7,6 @@ import com.amazonaws.services.dynamodbv2.document.internal.*;
 import com.amazonaws.services.dynamodbv2.document.spec.*;
 import com.amazonaws.services.dynamodbv2.document.utils.*;
 import com.amazonaws.services.dynamodbv2.model.*;
-import com.google.common.annotations.*;
 import com.google.common.base.*;
 import com.google.common.collect.*;
 import org.slf4j.*;
@@ -64,8 +63,7 @@ public class DynamoDbBroker {
                         .withProjectionType(ProjectionType.ALL));
     }
 
-    @VisibleForTesting
-    boolean deleteTable() {
+    public boolean deleteTable() {
         try {
             Table table = dynamoDB.getTable(tableName);
             table.delete();
@@ -86,10 +84,8 @@ public class DynamoDbBroker {
                     .withItem(new Item()
                             .withPrimaryKey(KEY_ATTRIBUTE_NAME, key)
                             .with(VALUE_ATTRIBUTE_NAME, value))
-                    .withConditionExpression("attribute_not_exists(" + KEY_ATTRIBUTE_NAME + ")");
-            PutItemOutcome putItemOutcome = table.putItem(putItemSpec);
-            PutItemResult putItemResult = putItemOutcome.getPutItemResult();
-            LOG.debug("put item result {}", putItemResult);
+                    .withConditionExpression("attribute_not_exists(" + KEY_ATTRIBUTE_NAME + ") AND attribute_not_exists(" + VALUE_ATTRIBUTE_NAME + ")");
+            table.putItem(putItemSpec);
 
             LOG.info("Successfully inserted entry {} -> {}", key, value);
             return true;
@@ -131,7 +127,7 @@ public class DynamoDbBroker {
             return null;
         }
         Item item = itemIterator.next();
-        Preconditions.checkState(!itemIterator.hasNext());
+        //Preconditions.checkState(!itemIterator.hasNext()); // there might be more than one key for this indexed value
 
         for (Map.Entry<String, Object> entry : item.attributes()) {
             if (entry.getKey().equals(KEY_ATTRIBUTE_NAME)) {
