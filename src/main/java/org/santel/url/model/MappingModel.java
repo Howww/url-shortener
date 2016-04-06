@@ -31,7 +31,7 @@ public class MappingModel {
         }
 
         // create short url, trying multiple times in case of collisions
-        int tries = 10;
+        int tries = 100;
         while (tries-- > 0) {
             // encode long url as an alphanumeric-base string
             String shortCode = alphanumericEncoder.encodeAlphanumeric(longUrl.toString());
@@ -59,6 +59,16 @@ public class MappingModel {
         throw new RuntimeException(errorMessage);
     }
 
+    public URL expandUrl(String shortCode) {
+        URL shortUrl = getShortUrlFromCode(shortCode);
+        URL longUrl = mappingDao.getLongUrl(shortUrl);
+        if (longUrl == null) {
+            Exceptions.logAndThrow(LOG, String.format("Short url %s not found in store", shortUrl));
+        }
+        LOG.info("Expanded {} to {}", shortUrl, longUrl);
+        return longUrl;
+    }
+
     private URL getShortUrlFromCode(String shortCode) {
         URL shortUrl;
         String hostName = Network.getLocalHostName();
@@ -69,15 +79,5 @@ public class MappingModel {
             throw new RuntimeException("Can't form short URL from original url, local host name, and code", e);
         }
         return shortUrl;
-    }
-
-    public URL expandUrl(String shortCode) {
-        URL shortUrl = getShortUrlFromCode(shortCode);
-        URL longUrl = mappingDao.getLongUrl(shortUrl);
-        if (longUrl == null) {
-            Exceptions.logAndThrow(LOG, String.format("Short url %s not found in store", shortUrl));
-        }
-        LOG.info("Expanded {} to {}", shortUrl, longUrl);
-        return longUrl;
     }
 }

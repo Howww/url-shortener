@@ -17,6 +17,9 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
 import java.util.regex.*;
 
+//*****************************************************************************************************************
+//TODO add test with mock Random object to simulate error of exhausting tries for getting a non-colliding short url
+//*****************************************************************************************************************
 @ContextConfiguration(classes = ShorteningService.class)
 public class MappingModelSpringTest extends AbstractTestNGSpringContextTests {
     private static final Logger LOG = LoggerFactory.getLogger(MappingModelSpringTest.class);
@@ -76,9 +79,10 @@ public class MappingModelSpringTest extends AbstractTestNGSpringContextTests {
         DYNAMO_DB_BROKER.deleteTable();
         Preconditions.checkState(DYNAMO_DB_BROKER.createTable());
     }
+
     @AfterMethod
     void afterMappingModelSpringTestMethod() {
-        Preconditions.checkState(DYNAMO_DB_BROKER.deleteTable());
+        Preconditions.checkState(DYNAMO_DB_BROKER.deleteTable()); // clean up after each test method
     }
 
     @Test

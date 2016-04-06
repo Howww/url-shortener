@@ -8,13 +8,14 @@ import javax.servlet.http.*;
 import java.io.*;
 import java.net.*;
 
+//TODO security: an XSS vulnerability would arise if the long url is ever returned to a browser or agent
+//TODO           ... for which ESAPI should be used (https://owasp-esapi-java.googlecode.com/svn/trunk_doc/latest/org/owasp/esapi/Encoder.html)
 @RestController
 public class ShorteningController {
 
     @Inject
     private MappingModel mappingModel;
 
-    //TODO security: XSS vulnerability
     @RequestMapping(value = "/shorten") //TODO constrain to method, e.g. method = RequestMethod.POST
     public String shortenUrl(@RequestParam(value="url") String longUrlAsString) throws MalformedURLException {
         URL longUrl = new URL(longUrlAsString);
