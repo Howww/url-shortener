@@ -1,20 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.santel</groupId>
     <artifactId>url-shortener</artifactId>
+    <packaging>war</packaging>
     <version>0.1.0</version>
+
+    <name>url-shortener</name>
+    <description>An example URL shortener using Spring Boot that can run on a single machine or AWS</description>
+
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>1.3.3.RELEASE</version>
+        <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
     <properties>
         <java.version>1.8</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <start-class>org.santel.url.ShorteningService</start-class>
     </properties>
 
     <dependencyManagement>
@@ -51,7 +58,25 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-remote-shell</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.springframework.boot</groupId>-->
+            <!--<artifactId>spring-boot-starter-tomcat</artifactId>-->
+            <!--<scope>provided</scope>-->
+        <!--</dependency>-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <!-- Test dependencies -->
@@ -77,31 +102,59 @@
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.19.1</version>
-                <dependencies>
+            <!--<plugin>-->
+                <!--<groupId>org.apache.maven.plugins</groupId>-->
+                <!--<artifactId>maven-compiler-plugin</artifactId>-->
+                <!--<configuration>-->
+                    <!--<source>1.8</source>-->
+                    <!--<target>1.8</target>-->
+                <!--</configuration>-->
+            <!--</plugin>-->
+            <!--<plugin>-->
+                <!--<groupId>org.apache.maven.plugins</groupId>-->
+                <!--<artifactId>maven-surefire-plugin</artifactId>-->
+                <!--<version>2.19.1</version>-->
+                <!--<dependencies>-->
+                    <!--&lt;!&ndash;<dependency>&ndash;&gt;-->
+                        <!--&lt;!&ndash;<groupId>org.apache.maven.surefire</groupId>&ndash;&gt;-->
+                        <!--&lt;!&ndash;<artifactId>surefire-junit47</artifactId>&ndash;&gt;-->
+                        <!--&lt;!&ndash;<version>2.19.1</version>&ndash;&gt;-->
+                    <!--&lt;!&ndash;</dependency>&ndash;&gt;-->
                     <!--<dependency>-->
                         <!--<groupId>org.apache.maven.surefire</groupId>-->
-                        <!--<artifactId>surefire-junit47</artifactId>-->
+                        <!--<artifactId>surefire-testng</artifactId>-->
                         <!--<version>2.19.1</version>-->
                     <!--</dependency>-->
-                    <dependency>
-                        <groupId>org.apache.maven.surefire</groupId>
-                        <artifactId>surefire-testng</artifactId>
-                        <version>2.19.1</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
+                <!--</dependencies>-->
+            <!--</plugin>-->
+            <!--&lt;!&ndash; Maven Assembly Plugin &ndash;&gt;-->
+            <!--<plugin>-->
+                <!--<groupId>org.apache.maven.plugins</groupId>-->
+                <!--<artifactId>maven-assembly-plugin</artifactId>-->
+                <!--<version>2.4.1</version>-->
+                <!--<configuration>-->
+                    <!--&lt;!&ndash; get all project dependencies &ndash;&gt;-->
+                    <!--<descriptorRefs>-->
+                        <!--<descriptorRef>jar-with-dependencies</descriptorRef>-->
+                    <!--</descriptorRefs>-->
+                    <!--&lt;!&ndash;&lt;!&ndash; MainClass in mainfest make a executable jar &ndash;&gt;&ndash;&gt;-->
+                    <!--&lt;!&ndash;<archive>&ndash;&gt;-->
+                        <!--&lt;!&ndash;<manifest>&ndash;&gt;-->
+                            <!--&lt;!&ndash;<mainClass>org.santel.url.ShorteningService</mainClass>&ndash;&gt;-->
+                        <!--&lt;!&ndash;</manifest>&ndash;&gt;-->
+                    <!--&lt;!&ndash;</archive>&ndash;&gt;-->
+                <!--</configuration>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<id>make-assembly</id>-->
+                        <!--&lt;!&ndash; bind to the packaging phase &ndash;&gt;-->
+                        <!--<phase>package</phase>-->
+                        <!--<goals>-->
+                            <!--<goal>single</goal>-->
+                        <!--</goals>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+            <!--</plugin>-->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -109,17 +162,17 @@
         </plugins>
     </build>
 
-    <repositories>
-        <repository>
-            <id>spring-releases</id>
-            <url>https://repo.spring.io/libs-release</url>
-        </repository>
-    </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>spring-releases</id>
-            <url>https://repo.spring.io/libs-release</url>
-        </pluginRepository>
-    </pluginRepositories>
+    <!--<repositories>-->
+        <!--<repository>-->
+            <!--<id>spring-releases</id>-->
+            <!--<url>https://repo.spring.io/libs-release</url>-->
+        <!--</repository>-->
+    <!--</repositories>-->
+    <!--<pluginRepositories>-->
+        <!--<pluginRepository>-->
+            <!--<id>spring-releases</id>-->
+            <!--<url>https://repo.spring.io/libs-release</url>-->
+        <!--</pluginRepository>-->
+    <!--</pluginRepositories>-->
 
 </project>
