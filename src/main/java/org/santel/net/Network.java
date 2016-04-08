@@ -14,17 +14,25 @@ public class Network {
     private static final Logger LOG = LoggerFactory.getLogger(Network.class);
 
     public static String getLocalHostName() {
-        String localHostName = getAwsPublicDnsName();
-
-        if (localHostName == null) {
-            try {
-                localHostName = InetAddress.getLocalHost().getCanonicalHostName();
-            } catch (UnknownHostException e) {
-                LOG.error("Exception identifying local host name", e);
-                throw new RuntimeException("Can't identify local host name", e);
-            }
+        // first, try property if provided
+        String localHostName = System.getProperty("santel.url.localhost");
+        if (localHostName != null) {
+            return localHostName;
         }
-        return localHostName;
+
+        // second, try AWS instance's public DNS name
+        localHostName = getAwsPublicDnsName();
+        if (localHostName != null) {
+            return localHostName;
+        }
+
+        // finally, try canonical host name from local system
+        try {
+            return InetAddress.getLocalHost().getCanonicalHostName();
+        } catch (UnknownHostException e) {
+            LOG.error("Exception identifying local host name", e);
+            throw new RuntimeException("Can't identify local host name", e);
+        }
     }
 
     private static String getAwsPublicDnsName() {
