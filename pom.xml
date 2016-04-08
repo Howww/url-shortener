@@ -47,6 +47,10 @@
             <artifactId>aws-java-sdk-s3</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-ec2</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>19.0</version>
@@ -68,11 +72,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>org.springframework.boot</groupId>-->
-            <!--<artifactId>spring-boot-starter-tomcat</artifactId>-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
             <!--<scope>provided</scope>-->
-        <!--</dependency>-->
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -102,77 +106,36 @@
 
     <build>
         <plugins>
-            <!--<plugin>-->
-                <!--<groupId>org.apache.maven.plugins</groupId>-->
-                <!--<artifactId>maven-compiler-plugin</artifactId>-->
-                <!--<configuration>-->
-                    <!--<source>1.8</source>-->
-                    <!--<target>1.8</target>-->
-                <!--</configuration>-->
-            <!--</plugin>-->
-            <!--<plugin>-->
-                <!--<groupId>org.apache.maven.plugins</groupId>-->
-                <!--<artifactId>maven-surefire-plugin</artifactId>-->
-                <!--<version>2.19.1</version>-->
-                <!--<dependencies>-->
-                    <!--&lt;!&ndash;<dependency>&ndash;&gt;-->
-                        <!--&lt;!&ndash;<groupId>org.apache.maven.surefire</groupId>&ndash;&gt;-->
-                        <!--&lt;!&ndash;<artifactId>surefire-junit47</artifactId>&ndash;&gt;-->
-                        <!--&lt;!&ndash;<version>2.19.1</version>&ndash;&gt;-->
-                    <!--&lt;!&ndash;</dependency>&ndash;&gt;-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.19.1</version>
+                <dependencies>
                     <!--<dependency>-->
                         <!--<groupId>org.apache.maven.surefire</groupId>-->
-                        <!--<artifactId>surefire-testng</artifactId>-->
+                        <!--<artifactId>surefire-junit47</artifactId>-->
                         <!--<version>2.19.1</version>-->
                     <!--</dependency>-->
-                <!--</dependencies>-->
-            <!--</plugin>-->
-            <!--&lt;!&ndash; Maven Assembly Plugin &ndash;&gt;-->
-            <!--<plugin>-->
-                <!--<groupId>org.apache.maven.plugins</groupId>-->
-                <!--<artifactId>maven-assembly-plugin</artifactId>-->
-                <!--<version>2.4.1</version>-->
-                <!--<configuration>-->
-                    <!--&lt;!&ndash; get all project dependencies &ndash;&gt;-->
-                    <!--<descriptorRefs>-->
-                        <!--<descriptorRef>jar-with-dependencies</descriptorRef>-->
-                    <!--</descriptorRefs>-->
-                    <!--&lt;!&ndash;&lt;!&ndash; MainClass in mainfest make a executable jar &ndash;&gt;&ndash;&gt;-->
-                    <!--&lt;!&ndash;<archive>&ndash;&gt;-->
-                        <!--&lt;!&ndash;<manifest>&ndash;&gt;-->
-                            <!--&lt;!&ndash;<mainClass>org.santel.url.ShorteningService</mainClass>&ndash;&gt;-->
-                        <!--&lt;!&ndash;</manifest>&ndash;&gt;-->
-                    <!--&lt;!&ndash;</archive>&ndash;&gt;-->
-                <!--</configuration>-->
-                <!--<executions>-->
-                    <!--<execution>-->
-                        <!--<id>make-assembly</id>-->
-                        <!--&lt;!&ndash; bind to the packaging phase &ndash;&gt;-->
-                        <!--<phase>package</phase>-->
-                        <!--<goals>-->
-                            <!--<goal>single</goal>-->
-                        <!--</goals>-->
-                    <!--</execution>-->
-                <!--</executions>-->
-            <!--</plugin>-->
+                    <dependency>
+                        <groupId>org.apache.maven.surefire</groupId>
+                        <artifactId>surefire-testng</artifactId>
+                        <version>2.19.1</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
-
-    <!--<repositories>-->
-        <!--<repository>-->
-            <!--<id>spring-releases</id>-->
-            <!--<url>https://repo.spring.io/libs-release</url>-->
-        <!--</repository>-->
-    <!--</repositories>-->
-    <!--<pluginRepositories>-->
-        <!--<pluginRepository>-->
-            <!--<id>spring-releases</id>-->
-            <!--<url>https://repo.spring.io/libs-release</url>-->
-        <!--</pluginRepository>-->
-    <!--</pluginRepositories>-->
 
 </project>

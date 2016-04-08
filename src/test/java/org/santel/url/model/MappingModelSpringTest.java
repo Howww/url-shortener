@@ -1,6 +1,7 @@
 package org.santel.url.model;
 
 import com.google.common.base.*;
+import org.santel.net.*;
 import org.santel.url.*;
 import org.santel.url.dao.*;
 import org.slf4j.*;
@@ -29,7 +30,7 @@ public class MappingModelSpringTest extends AbstractTestNGSpringContextTests {
     static {
         try {
             LONG_URL = new URL("https://some.domain.of.mine/path?param1=foo&param2=bar#section");
-            SHORT_URL_PATTERN = Pattern.compile(SHORT_URL_PREFIX + InetAddress.getLocalHost().getHostName() + "/[0-9a-z-A-Z]{1," + AlphanumericEncoder.BASE_ALPHANUMERIC + "}");
+            SHORT_URL_PATTERN = Pattern.compile(SHORT_URL_PREFIX + Network.getLocalHostName() + "/[0-9a-z-A-Z]{1," + AlphanumericEncoder.BASE_ALPHANUMERIC + "}");
         } catch (Exception e) {
             throw new RuntimeException("Failed to initialize static fields", e);
         }
